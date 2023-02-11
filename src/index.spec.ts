@@ -2,6 +2,7 @@ import assert from 'assert';
 import { expectTypeOf } from 'expect-type';
 import {
   getValid,
+  LiteralParser,
   NumberParser,
   ObjectParser,
   TupleParser,
@@ -93,7 +94,8 @@ describe('index', () => {
 
       object: ObjectParser({
         a: NumberParser(),
-        b: StringParser()
+        b: StringParser(),
+        c: LiteralParser(['abc', 123] as const)
       }),
 
       array: ArrayParser(NumberParser()),
@@ -114,7 +116,7 @@ describe('index', () => {
       const [result, errors] = getValid(schema, {
         num: 1,
         tuple: [1, 'thing', undefined],
-        object: { a: 1, b: 'foo' },
+        object: { a: 1, b: 'foo', c: 'abc' },
         array: [1, 2, 3],
         arrayWithNullElements: [1, null, 3],
         objectArray: [{ a: 1, b: 'foo' }],
@@ -144,7 +146,7 @@ describe('index', () => {
       deepEqual(result, {
         num: 1,
         tuple: [1, 'thing', undefined],
-        object: { a: 1, b: 'foo' },
+        object: { a: 1, b: 'foo', c: 'abc' },
         array: [1, 2, 3],
         arrayWithNullElements: [1, null, 3],
         objectArray: [{ a: 1, b: 'foo' }],
@@ -166,6 +168,10 @@ describe('index', () => {
 
       deepEqual(result, ValidationFail);
       deepEqual(errors, [
+        {
+          message: 'Value is not optional',
+          path: ['Property "object"', 'Property "c"']
+        },
         {
           message: 'Value "2" is not a number',
           path: ['Property "array"', 'Element 1']
