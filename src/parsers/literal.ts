@@ -1,11 +1,14 @@
 import {
+  buildJoiSchemaWithOptions,
   checkEmpty,
+  JOI_TOKEN,
   ParserInput,
   ParserResult,
   StandardOptions,
   StandardOptionsReturn,
   ValidationFail
 } from './common';
+import Joi from 'joi';
 
 export const LiteralParser = <
   TLiteralType extends string | number,
@@ -18,6 +21,13 @@ export const LiteralParser = <
 ): ParserResult<TLiteralType | StandardOptionsReturn<TOptions>> & {
   readonly literals: readonly TLiteralType[];
 } => {
+  if (inp.value === JOI_TOKEN) {
+    return buildJoiSchemaWithOptions(
+      Joi.any().valid(...literals),
+      options
+    ) as any;
+  }
+
   const emptyResult = checkEmpty(inp, options);
 
   if (emptyResult) {

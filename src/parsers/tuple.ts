@@ -1,4 +1,6 @@
+import Joi from 'joi';
 import {
+  buildJoiSchemaWithOptions,
   checkEmpty,
   Parser,
   ParserInput,
@@ -6,7 +8,8 @@ import {
   StandardOptions,
   StandardOptionsReturn,
   ValidationError,
-  ValidationFail
+  ValidationFail,
+  JOI_TOKEN
 } from './common';
 
 export const TupleParser = <
@@ -20,6 +23,22 @@ export const TupleParser = <
 ): ParserResult<
   TupleSchemaToValue<TSchema> | StandardOptionsReturn<TOptions>
 > => {
+  if (inp.value === JOI_TOKEN) {
+    const innerJoiTupleSchema: Joi.SchemaMap = {};
+
+    Object.entries(schema).forEach(([propName, propParser]) => {
+      innerJoiTupleSchema[propName] = propParser({
+        value: JOI_TOKEN,
+        path: []
+      });
+    });
+
+    return buildJoiSchemaWithOptions(
+      Joi.object(innerJoiTupleSchema),
+      options
+    ) as any;
+  }
+
   const emptyResult = checkEmpty(inp, options);
 
   if (emptyResult) {

@@ -1,12 +1,15 @@
+import Joi from 'joi';
 import { ArrayElementType } from '../util';
 import {
+  buildJoiSchemaWithOptions,
   checkEmpty,
   Parser,
   ParserInput,
   ParserResult,
   StandardOptions,
   ValidationError,
-  ValidationFail
+  ValidationFail,
+  JOI_TOKEN
 } from './common';
 
 interface UnionOptions extends StandardOptions {
@@ -20,6 +23,17 @@ export const UnionParser = <
   schema: TSchema,
   options?: TOptions
 ) => (inp: ParserInput): ParserResult<UnionSchemaToValue<TSchema>> => {
+  if (inp.value === JOI_TOKEN) {
+    const joiSchema = Joi.alternatives().try(
+      ...schema.map(
+        parser =>
+          (parser({ value: JOI_TOKEN, path: [] }) as unknown) as Joi.Schema
+      )
+    );
+
+    return buildJoiSchemaWithOptions(joiSchema, options) as any;
+  }
+
   const emptyResult = checkEmpty(inp, options);
 
   if (emptyResult) {

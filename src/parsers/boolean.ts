@@ -1,10 +1,13 @@
+import Joi from 'joi';
 import {
+  buildJoiSchemaWithOptions,
   checkEmpty,
   ParserInput,
   ParserResult,
   StandardOptions,
   StandardOptionsReturn,
-  ValidationFail
+  ValidationFail,
+  JOI_TOKEN
 } from './common';
 
 export const BooleanParser = <TOptions extends StandardOptions>(
@@ -12,6 +15,10 @@ export const BooleanParser = <TOptions extends StandardOptions>(
 ) => (
   inp: ParserInput
 ): ParserResult<boolean | StandardOptionsReturn<TOptions>> => {
+  if (inp.value === JOI_TOKEN) {
+    return buildJoiSchemaWithOptions(Joi.boolean(), options) as any;
+  }
+
   const emptyResult = checkEmpty(inp, options);
 
   if (emptyResult) {

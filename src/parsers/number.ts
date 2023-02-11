@@ -1,14 +1,18 @@
+import Joi from 'joi';
 import {
+  buildJoiSchemaWithOptions,
   checkEmpty,
   ParserInput,
   ParserResult,
   StandardOptions,
   StandardOptionsReturn,
-  ValidationFail
+  ValidationFail,
+  JOI_TOKEN
 } from './common';
 
 interface NumberOptions extends StandardOptions {
   readonly allowNumeric?: boolean;
+  readonly example?: number;
 }
 
 export const NumberParser = <TOptions extends NumberOptions>(
@@ -16,6 +20,16 @@ export const NumberParser = <TOptions extends NumberOptions>(
 ) => (
   inp: ParserInput
 ): ParserResult<number | StandardOptionsReturn<TOptions>> => {
+  if (inp.value === JOI_TOKEN) {
+    let joiNumberSchema = buildJoiSchemaWithOptions(Joi.number(), options);
+
+    if (options && options.example) {
+      joiNumberSchema = joiNumberSchema.example(options.example);
+    }
+
+    return joiNumberSchema as any;
+  }
+
   const emptyResult = checkEmpty(inp, options);
 
   if (emptyResult) {

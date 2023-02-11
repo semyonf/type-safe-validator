@@ -1,4 +1,6 @@
+import Joi from 'joi';
 import {
+  buildJoiSchemaWithOptions,
   checkEmpty,
   Parser,
   ParserInput,
@@ -6,12 +8,13 @@ import {
   StandardOptions,
   StandardOptionsReturn,
   ValidationError,
-  ValidationFail
+  ValidationFail,
+  JOI_TOKEN
 } from './common';
 
 export const ObjectParser = <
   TSchema extends Record<string, Parser<any>>,
-  TOptions extends StandardOptions
+  TOptions extends StandardOptions & { label: string }
 >(
   schema: TSchema,
   options?: TOptions,
@@ -23,6 +26,22 @@ export const ObjectParser = <
 ): ParserResult<
   ObjectSchemaToValue<TSchema> | StandardOptionsReturn<TOptions>
 > & { readonly schema: TSchema } => {
+  if (inp.value === JOI_TOKEN) {
+    const schemaMap: Joi.SchemaMap = {};
+
+    Object.entries(schema).forEach(([propName, propParser]) => {
+      schemaMap[propName] = propParser({ value: JOI_TOKEN, path: [] });
+    });
+
+    let joiSchema = buildJoiSchemaWithOptions(Joi.object(schemaMap), options);
+
+    if (options && options.label) {
+      joiSchema = joiSchema.label(options.label);
+    }
+
+    return joiSchema as never;
+  }
+
   if (intercept) {
     try {
       // tslint:disable-next-line: no-parameter-reassignment

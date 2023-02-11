@@ -1,11 +1,14 @@
+import Joi from 'joi';
 import {
+  buildJoiSchemaWithOptions,
   checkEmpty,
   ParserInput,
   ParserResult,
   StandardOptions,
   StandardOptionsReturn,
   ValidationError,
-  ValidationFail
+  ValidationFail,
+  JOI_TOKEN
 } from './common';
 
 interface StringOptions extends StandardOptions {
@@ -13,6 +16,7 @@ interface StringOptions extends StandardOptions {
   readonly minLength?: number;
   readonly maxLength?: number;
   readonly regExp?: RegExp;
+  readonly example?: string;
 }
 
 export const StringParser = <TOptions extends StringOptions>(
@@ -20,6 +24,16 @@ export const StringParser = <TOptions extends StringOptions>(
 ) => (
   inp: ParserInput
 ): ParserResult<string | StandardOptionsReturn<TOptions>> => {
+  if (inp.value === JOI_TOKEN) {
+    let joiStringSchema = buildJoiSchemaWithOptions(Joi.string(), options);
+
+    if (options && options.example) {
+      joiStringSchema = joiStringSchema.example(options.example);
+    }
+
+    return joiStringSchema as any;
+  }
+
   const emptyResult = checkEmpty(inp, options);
 
   if (emptyResult) {

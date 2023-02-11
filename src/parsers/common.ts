@@ -1,3 +1,5 @@
+import Joi from 'joi';
+
 export type Parser<TValue> = (inp: ParserInput) => ParserResult<TValue>;
 
 export interface ParserInput<T = any> {
@@ -24,6 +26,7 @@ export type ValidationFail = typeof ValidationFail;
 export interface StandardOptions {
   readonly nullable?: boolean;
   readonly optional?: boolean;
+  readonly description?: string;
 }
 
 export type StandardOptionsReturn<TOptions extends StandardOptions> =
@@ -73,4 +76,25 @@ export function checkEmpty(
   }
 
   return null;
+}
+
+export const JOI_TOKEN = Symbol('JOI_TOKEN');
+
+export function buildJoiSchemaWithOptions<TSchema extends Joi.Schema>(
+  schema: TSchema,
+  options?: StandardOptions
+) {
+  if (!options || !options.optional) {
+    schema = schema.required() as TSchema;
+  }
+
+  if (options && options.nullable) {
+    schema = schema.allow(null) as TSchema;
+  }
+
+  if (options && options.description) {
+    schema = schema.description(options.description) as TSchema;
+  }
+
+  return schema;
 }

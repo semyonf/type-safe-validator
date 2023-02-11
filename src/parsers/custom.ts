@@ -1,10 +1,12 @@
+import Joi from 'joi';
 import {
   checkEmpty,
   ParserInput,
   ParserResult,
   StandardOptions,
   StandardOptionsReturn,
-  ValidationFail
+  ValidationFail,
+  JOI_TOKEN
 } from './common';
 
 export const CustomParser = <TValue, TOptions extends StandardOptions>(
@@ -13,6 +15,10 @@ export const CustomParser = <TValue, TOptions extends StandardOptions>(
 ) => (
   inp: ParserInput
 ): ParserResult<TValue | StandardOptionsReturn<TOptions>> => {
+  if (inp.value === JOI_TOKEN) {
+    return Joi.any() as any;
+  }
+
   const emptyResult = checkEmpty(inp, options);
 
   if (emptyResult) {

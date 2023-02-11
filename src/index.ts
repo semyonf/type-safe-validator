@@ -1,9 +1,11 @@
+import Joi from 'joi';
 import {
   Parser,
   ParserPath,
   ValidationError,
-  ValidationFail
-} from './parsers/common';
+  ValidationFail,
+  JOI_TOKEN
+} from './parsers';
 
 export * from './parsers';
 export * from './util';
@@ -32,6 +34,10 @@ export function getValid<TValue>(
   const result = parser({ path: [], value: inp });
 
   return [result.value, result.errors] as const;
+}
+
+export function getJoiSchema<TValue>(parser: Parser<TValue>): Joi.Schema {
+  return (parser({ value: JOI_TOKEN, path: [] }) as unknown) as Joi.Schema;
 }
 
 function getPathName(path: ParserPath): string {

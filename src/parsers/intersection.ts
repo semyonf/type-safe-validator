@@ -1,6 +1,7 @@
 import { ArrayElementType } from '../util';
 import {
   checkEmpty,
+  JOI_TOKEN,
   Parser,
   ParserInput,
   ParserResult,
@@ -8,6 +9,7 @@ import {
   ValidationError,
   ValidationFail
 } from './common';
+import Joi from 'joi';
 
 export type UnionToIntersection<U> = (U extends any
   ? (k: U) => void
@@ -22,6 +24,10 @@ export const IntersectionParser = <
   schema: TSchema,
   options?: TOptions
 ) => (inp: ParserInput): ParserResult<IntersectionSchemaToValue<TSchema>> => {
+  if (inp.value === JOI_TOKEN) {
+    return Joi.any() as any;
+  }
+
   const emptyResult = checkEmpty(inp, options);
 
   if (emptyResult) {

@@ -1,3 +1,4 @@
+import Joi from 'joi';
 import {
   checkEmpty,
   Parser,
@@ -5,7 +6,9 @@ import {
   ParserResult,
   StandardOptions,
   StandardOptionsReturn,
-  ValidationFail
+  ValidationFail,
+  JOI_TOKEN,
+  buildJoiSchemaWithOptions
 } from './common';
 
 export const ArrayParser = <TValue, TOptions extends StandardOptions>(
@@ -14,6 +17,15 @@ export const ArrayParser = <TValue, TOptions extends StandardOptions>(
 ) => (
   inp: ParserInput
 ): ParserResult<readonly TValue[] | StandardOptionsReturn<TOptions>> => {
+  if (inp.value === JOI_TOKEN) {
+    return buildJoiSchemaWithOptions(Joi.array(), options).items((elementParser(
+      {
+        value: JOI_TOKEN,
+        path: []
+      }
+    ) as unknown) as Joi.Schema) as any;
+  }
+
   const emptyResult = checkEmpty(inp, options);
 
   if (emptyResult) {
