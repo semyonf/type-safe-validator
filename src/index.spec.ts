@@ -1,6 +1,7 @@
 import assert from 'assert';
 import { expectTypeOf } from 'expect-type';
 import {
+  getJoiSchema,
   getValid,
   NumberParser,
   ObjectParser,
@@ -108,6 +109,76 @@ describe('index', () => {
       ),
 
       stringOrNumber: UnionParser([StringParser(), NumberParser()])
+    });
+
+    it('can convert to Joi schema', () => {
+      assert.deepStrictEqual(getJoiSchema(schema).describe(), {
+        type: 'object',
+        flags: { presence: 'required' },
+        keys: {
+          num: { type: 'number', flags: { presence: 'required' } },
+          tuple: {
+            type: 'object',
+            flags: { presence: 'required' },
+            keys: {
+              '0': { type: 'number', flags: { presence: 'required' } },
+              '1': {
+                type: 'string',
+                flags: { presence: 'required' },
+                allow: [null]
+              },
+              '2': { type: 'boolean' }
+            }
+          },
+          object: {
+            type: 'object',
+            flags: { presence: 'required' },
+            keys: {
+              a: { type: 'number', flags: { presence: 'required' } },
+              b: { type: 'string', flags: { presence: 'required' } },
+              c: {
+                allow: ['abc', 123],
+                flags: { only: true, presence: 'required' },
+                type: 'any'
+              }
+            }
+          },
+          array: {
+            type: 'array',
+            flags: { presence: 'required' },
+            items: [{ type: 'number', flags: { presence: 'required' } }]
+          },
+          arrayWithNullElements: {
+            type: 'array',
+            flags: { presence: 'required' },
+            items: [
+              { type: 'number', flags: { presence: 'required' }, allow: [null] }
+            ]
+          },
+          objectArray: {
+            type: 'array',
+            flags: { presence: 'required' },
+            items: [
+              {
+                type: 'object',
+                flags: { presence: 'required' },
+                keys: {
+                  a: { type: 'number', flags: { presence: 'required' } },
+                  b: { type: 'string', flags: { presence: 'required' } }
+                }
+              }
+            ]
+          },
+          stringOrNumber: {
+            type: 'alternatives',
+            flags: { presence: 'required' },
+            matches: [
+              { schema: { type: 'string', flags: { presence: 'required' } } },
+              { schema: { type: 'number', flags: { presence: 'required' } } }
+            ]
+          }
+        }
+      });
     });
 
     it('can validate', () => {
