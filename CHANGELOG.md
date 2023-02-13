@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.1.0 (2023-02-13)
+
+
+### Bug Fixes
+
+* add missing implementation for StringParser's "allowNumeric" option ([8fb47a5](https://github.com/semyonf/type-safe-validator/commit/8fb47a5))
+
+
+### Features
+
+* add flexibility to NumberParser's logic ([41c3967](https://github.com/semyonf/type-safe-validator/commit/41c3967))
+
+
+### Tests
+
+* add expect-type package and utilize it ([31fe10f](https://github.com/semyonf/type-safe-validator/commit/31fe10f))
+
+
+
 ### [1.0.32](https://github.com/cjdell/type-safe-validator/compare/v1.0.31...v1.0.32) (2020-09-17)
 
 
