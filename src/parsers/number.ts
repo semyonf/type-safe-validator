@@ -12,14 +12,21 @@ import {
 
 interface NumberOptions extends StandardOptions {
   readonly allowNumeric?: boolean;
+  readonly allowTypeCoercion?: boolean;
   readonly example?: number;
 }
 
 export const NumberParser = <TOptions extends NumberOptions>(
-  options?: TOptions
+  optionsParameter?: TOptions
 ) => (
   inp: ParserInput
 ): ParserResult<number | StandardOptionsReturn<TOptions>> => {
+  const options = {
+    allowTypeCoercion: true,
+    ...optionsParameter
+    // tslint:disable-next-line: no-object-literal-type-assertion
+  } as TOptions;
+
   if (inp.value === JOI_TOKEN) {
     let joiNumberSchema = buildJoiSchemaWithOptions(Joi.number(), options);
 
@@ -65,14 +72,14 @@ const handleNonNumber = (
   options?: NumberOptions
 ): ParserResult<any> | null => {
   if (typeof inp.value === 'string' && options && options.allowNumeric) {
-    if (inp.value === '' && options.optional) {
+    if (inp.value === '' && options.optional && options.allowTypeCoercion) {
       return {
         value: undefined,
         errors: []
       };
     }
 
-    if (inp.value === 'null' && options.nullable) {
+    if (inp.value === 'null' && options.nullable && options.allowTypeCoercion) {
       return {
         value: null,
         errors: []

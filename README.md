@@ -1,3 +1,5 @@
+> Originally forked from https://github.com/cjdell/type-safe-validator
+
 # type-safe-validator
 
 A validation library designed to take full advantage of the TypeScript type system. All return types are inferred directly from the schema.
