@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0-0](https://github.com/semyonf/type-safe-validator/compare/v1.1.0...v1.2.0-0) (2023-02-13)
+
+
+### Features
+
+* add joi schema output ([1d85306](https://github.com/semyonf/type-safe-validator/commit/1d85306))
+
+
+### Tests
+
+* add a test for LiteralParser ([8ac03ab](https://github.com/semyonf/type-safe-validator/commit/8ac03ab))
+* add joi schema output test ([a8fa4e2](https://github.com/semyonf/type-safe-validator/commit/a8fa4e2))
+
+
+
 ## 1.1.0 (2023-02-13)
 
 
